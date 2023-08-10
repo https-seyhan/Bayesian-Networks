@@ -4,6 +4,6 @@ Our approach to Bayesian Network modeling is based on https://ftp.cs.ucla.edu/pu
 
 https://www.annytab.com/bayesian-networks-in-python/
 
-### Documentation of pgmpy
+## Documentation of pgmpy
 https://arxiv.org/pdf/2304.08639.pdf
 
