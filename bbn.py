@@ -97,4 +97,64 @@ def likelihood_weighted_sampling(data, query_var, evidence, n=1000):
     for _ in range(n):
         weight = 1.0
         sample = {}
-        for col in ['Weather',
+        for col in ['Weather', 'TeamSkill', 'SiteAccess', 'RiskLevel', 'EquipmentStatus', 'Delay']:
+            parents = {
+                'RiskLevel': ['TeamSkill', 'Weather'],
+                'SiteAccess': ['Weather'],
+                'EquipmentStatus': ['Weather', 'SiteAccess'],
+                'Delay': ['RiskLevel', 'EquipmentStatus']
+            }.get(col, [])
+
+            if col in evidence:
+                sample[col] = evidence[col]
+                if parents:
+                    cpt = compute_cpt(data, parents, col)
+                    parent_vals = tuple(sample[p] for p in parents)
+                    try:
+                        weight *= cpt.loc[parent_vals][evidence[col]]
+                    except:
+                        weight *= 0
+                else:
+                    prob = data[col].value_counts(normalize=True)
+                    weight *= prob.get(evidence[col], 0)
+            else:
+                if parents:
+                    cpt = compute_cpt(data, parents, col)
+                    parent_vals = tuple(sample[p] for p in parents)
+                    prob_row = cpt.loc[parent_vals]
+                    val = np.random.choice(prob_row.index, p=prob_row.values)
+                else:
+                    prob = data[col].value_counts(normalize=True)
+                    val = np.random.choice(prob.index, p=prob.values)
+                sample[col] = val
+
+        samples.append(sample[query_var])
+        weights.append(weight)
+
+    result = pd.Series(samples)
+    weighted_probs = result.groupby(result).apply(
+        lambda x: np.sum([weights[i] for i in x.index])
+    )
+    return (weighted_probs / weighted_probs.sum()).sort_values(ascending=False)
+
+# Example query
+posterior = likelihood_weighted_sampling(
+    data=data,
+    query_var='Delay',
+    evidence={'RiskLevel': 'High', 'EquipmentStatus': 'Poor'},
+    n=5000
+)
+
+print("\nPosterior P(Delay | RiskLevel=High, EquipmentStatus=Poor):")
+print(posterior)
+
+
+🔄 Generates simulated categorical data
+
+🧠 Defines and visualizes the BBN structure
+
+📊 Creates CPTs directly from data
+
+🔁 Samples full joint distributions
+
+🎯 Performs likelihood-weighted inference based on any evidence
