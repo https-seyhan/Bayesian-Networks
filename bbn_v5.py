@@ -15,7 +15,7 @@ age = np.random.choice(['young', 'middle', 'old'], size=N, p=[0.3, 0.5, 0.2])
 gender = np.random.choice(['male', 'female'], size=N)
 ses = np.random.choice(['low', 'medium', 'high'], size=N, p=[0.4, 0.4, 0.2])
 
-# Simulate fly_support as a function of treatment and covariates
+# Simulate behavioral_support as a function of treatment and covariates
 def simulate_behavior(t, a, g, s):
     score = treatment_values.index(t) * 0.2
     score += {'young': 0.1, 'middle': 0.2, 'old': 0.05}[a]
@@ -24,7 +24,7 @@ def simulate_behavior(t, a, g, s):
     prob = min(score / 2.0, 1.0)
     return np.random.choice(['low', 'medium', 'high'], p=[1-prob, prob/2, prob/2])
 
-fly_support = [
+behavioral_support = [
     simulate_behavior(t, a, g, s) for t, a, g, s in zip(T, age, gender, ses)
 ]
 
@@ -33,7 +33,7 @@ df = pd.DataFrame({
     'age': age,
     'gender': gender,
     'ses': ses,
-    'fly_support': fly_support
+    'behavioral_support': behavioral_support
 })
 
 # 2. Encode Categorical Variables
@@ -50,10 +50,10 @@ age_dist = DiscreteDistribution(df_encoded['age'].value_counts(normalize=True).t
 gender_dist = DiscreteDistribution(df_encoded['gender'].value_counts(normalize=True).to_dict())
 ses_dist = DiscreteDistribution(df_encoded['ses'].value_counts(normalize=True).to_dict())
 
-# Conditional probability for fly_support
+# Conditional probability for behavioral_support
 # Given: treatment, age, gender, ses
 X = df_encoded[['treatment', 'age', 'gender', 'ses']]
-y = df_encoded['fly_support']
+y = df_encoded['behavioral_support']
 
 # Create CPT manually
 from collections import defaultdict, Counter
@@ -85,10 +85,10 @@ behavior_cpt = ConditionalProbabilityTable(
     cpt_entries,
     [treatment_dist, age_dist, gender_dist, ses_dist]
 )
-behavior_node = Node(behavior_cpt, name="fly_support")
+behavior_node = Node(behavior_cpt, name="behavioral_support")
 
 # 4. Build the Bayesian Network
-model = BayesianNetwork("fly Support BBN")
+model = BayesianNetwork("Behavioral Support BBN")
 model.add_states(treatment_node, age_node, gender_node, ses_node, behavior_node)
 
 model.add_edge(treatment_node, behavior_node)
@@ -99,7 +99,7 @@ model.add_edge(ses_node, behavior_node)
 model.bake()
 
 # 5. Inference Example
-# Predict fly_support given treatment = 'A' and SES = 'medium'
+# Predict behavioral_support given treatment = 'A' and SES = 'medium'
 query_input = {
     "treatment": encodings['treatment']['A'],
     "ses": encodings['ses']['medium'],
@@ -110,11 +110,11 @@ query_input = {
 beliefs = model.predict_proba(query_input)
 decoded_support = beliefs[-1].parameters[0]
 decoded_support_named = {
-    list(encodings['fly_support'].keys())[list(encodings['fly_support'].values()).index(k)]: v
+    list(encodings['behavioral_support'].keys())[list(encodings['behavioral_support'].values()).index(k)]: v
     for k, v in decoded_support.items()
 }
 
-print("Predicted fly Support Probabilities:")
+print("Predicted Behavioral Support Probabilities:")
 print(decoded_support_named)
 
 import networkx as nx
@@ -134,9 +134,8 @@ nx.draw(G, pos, with_labels=True, node_size=3000, node_color='skyblue', font_siz
 plt.title("Bayesian Belief Network Structure", fontsize=14)
 plt.show()
 
-
 treatment ─┐
-           ├──► fly_support
+           ├──► behavioral_support
      age ──┘
   gender ──┘
       ses ─┘
