@@ -16,7 +16,7 @@ gender = np.random.choice(['male', 'female'], size=N)
 ses = np.random.choice(['low', 'medium', 'high'], size=N, p=[0.4, 0.4, 0.2])
 
 # Simulate behavioral_support as a function of treatment and covariates
-def simulate_behavior(t, a, g, s):
+def simulate_fl(t, a, g, s):
     score = treatment_values.index(t) * 0.2
     score += {'young': 0.1, 'middle': 0.2, 'old': 0.05}[a]
     score += {'male': 0.1, 'female': 0.2}[g]
