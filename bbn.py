@@ -230,3 +230,7 @@ Bayesian Network (BN) | Graph representing conditional dependencies
 CPT (Conditional Probability Table) | Table defining probability of a variable given its parents
 Joint Sampling | Sampling a full scenario consistent with BN
 Likelihood-Weighted Sampling | Sampling while adjusting probability weights to account for evidence
+
+If Weather is bad and Equipment is poor, there's a higher chance of delay.
+
+Your model learns these relationships and can simulate or predict based on them.
