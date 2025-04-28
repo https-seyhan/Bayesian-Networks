@@ -234,3 +234,11 @@ Likelihood-Weighted Sampling | Sampling while adjusting probability weights to a
 If Weather is bad and Equipment is poor, there's a higher chance of delay.
 
 Your model learns these relationships and can simulate or predict based on them.
+
+If it's Rainy, the site access becomes harder.
+
+If site access is difficult, the equipment often gets damaged.
+
+If the team is less skilled, the risk level increases.
+
+If risk and equipment are bad, there will probably be delays.
