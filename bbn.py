@@ -155,6 +155,78 @@ print(posterior)
 
 📊 Creates CPTs directly from data
 
+
+Creates a dataset of 1000 rows where:
+
+    Weather is Sunny/Rainy/Windy
+
+    Equipment status is Good/Average/Poor
+
+    Team skill is High/Medium/Low
+
+    Site access is Easy/Moderate/Difficult
+
+    Risk level is Low/Medium/High
+
+    Delay is NoDelay/MinorDelay/MajorDelay
+
+Each column is generated using random choices with given probabilities.
+
+
+
+
+
 🔁 Samples full joint distributions
 
 🎯 Performs likelihood-weighted inference based on any evidence
+
+
+compute_cpt(): Given parent columns and a child column, it:
+
+    Groups data by parents and child.
+
+    Counts occurrences.
+
+    Normalizes to make it a probability table.
+
+Builds Conditional Probability Tables:
+
+    How RiskLevel depends on TeamSkill and Weather
+
+    How SiteAccess depends on Weather
+
+    etc.
+
+sample_joint():
+
+    Simulates new rows.
+
+    Samples variables sequentially:
+
+        If no parents → sample from marginal probability.
+
+        If parents → sample according to CPT conditional on sampled parents.
+
+Useful to generate synthetic scenarios consistent with the model.
+
+likelihood_weighted_sampling():
+
+    Given some known evidence (e.g., RiskLevel=High and EquipmentStatus=Poor), estimate the posterior probability of another variable (e.g., Delay).
+
+    Process:
+
+        Fix evidence variables.
+
+        Adjust weight based on how likely the evidence is under sampled parents.
+
+        Return a weighted estimate of the queried variable.
+
+Why use weights?
+
+    Because not all samples are equally likely given the evidence.
+
+Concept | Meaning
+Bayesian Network (BN) | Graph representing conditional dependencies
+CPT (Conditional Probability Table) | Table defining probability of a variable given its parents
+Joint Sampling | Sampling a full scenario consistent with BN
+Likelihood-Weighted Sampling | Sampling while adjusting probability weights to account for evidence
